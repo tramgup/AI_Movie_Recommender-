@@ -12,3 +12,49 @@ generator client {
 datasource db {
   provider = "postgresql"
 }
+
+model User {
+  id    Int    @id @default(autoincrement())
+  email String @unique
+  username String @unique
+  passwordHash  String
+
+  ratings Rating[]
+  recommendations Recommendations[]
+
+}
+
+model Movie {
+  id          String   @id @default(uuid())
+  title       String
+  description String?
+  genre       String[]
+  releaseYear Int?
+  posterUrl   String?
+
+  ratings Rating[]
+  recommendations Recommendations[]
+}
+
+model Rating {
+  id        String   @id @default(uuid())
+  rating    Boolean
+
+  userId  String
+  user    User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  movieId String
+  movie   Movie  @relation(fields: [movieId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, movieId])
+}
+
+model Recommendation {
+  id        String   @id @default(uuid())
+  score     Float
+  reason    String?
+
+  userId  String
+  user    User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  movieId String
+  movie   Movie  @relation(fields: [movieId], references: [id], onDelete: Cascade)
+}
