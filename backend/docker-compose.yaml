@@ -3,9 +3,9 @@
 services:
   app:
     build: .
-    container_name: e-commerce-app
+    container_name: movie-app
     environment:
-      - DATABASE_URL=postgresql://postgres:postgres@db:5432/e-commerce-app
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/movie-app
       - JWT_SECRET=your_jwt_secret_here
       - NODE_ENV=development
       - PORT=5003
@@ -15,6 +15,7 @@ services:
       - db
     volumes:
       - .:/app
+      - /app/node_modules
 
   db:
     image: postgres:13-alpine
@@ -22,7 +23,7 @@ services:
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: e-commerce-app
+      POSTGRES_DB: movie-app
     ports:
       - "5432:5432"
     volumes:

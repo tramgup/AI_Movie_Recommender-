@@ -1,5 +1,5 @@
 import express from 'express'
-import bcrypt from 'bcryptjs'
+import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
 import prisma from '../prismaClient.js'
 
@@ -62,7 +62,7 @@ router.post('/login', async (req, res) => {
     };
 
     try {
-        const user = await prisma.user.findUnique({
+        const user = await prisma.user.findFirst({
             where: {
       OR: [{ email: emailOrUsername }, { username: emailOrUsername }],
         },

@@ -21,7 +21,6 @@ app.use(express.urlencoded({ extended: true }));
 
 // Routes, prepends /auth to all authroutes, and /todos to all todoRoutes
 app.use('/auth', authRoutes);
-app.use('/shopping', authMiddleware, shoppingRoutes);
 
 app.listen(PORT, () => {
     console.log(`Server has started on port: ${PORT}`)
