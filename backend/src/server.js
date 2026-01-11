@@ -3,6 +3,7 @@ import path, { dirname } from 'path'
 import { fileURLToPath } from 'url'
 import authRoutes from './routes/authRoutes.js'
 import authMiddleware from './middleware/authMiddleware.js'
+import adminMiddleware from './middleware/adminMiddleware.js'
 import homeRoutes from './routes/homeRoutes.js'
 import adminRoutes from './routes/adminRoutes.js'
 import cors from 'cors'
@@ -23,8 +24,8 @@ app.use(express.urlencoded({ extended: true }));
 
 // Routes, prepends /auth to all authroutes, and /todos to all todoRoutes
 app.use('/auth', authRoutes);
-app.use('/', homeRoutes);
-app.use('/admin', adminRoutes);
+app.use('/home', authMiddleware, homeRoutes);
+app.use('/admin', authMiddleware, adminMiddleware, adminRoutes);
 
 app.listen(PORT, () => {
     console.log(`Server has started on port: ${PORT}`)

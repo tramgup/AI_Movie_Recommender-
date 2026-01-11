@@ -1,11 +1,12 @@
 import express from 'express'
-import { adminMiddleware } from '../middleware/authMiddleware.js'
+import authMiddleware from '../middleware/authMiddleware.js'
+import adminMiddleware from '../middleware/adminMiddleware.js'
 import { ingestMovies } from '../scripts/tmdbIngest.js'
 
 const router = express.Router()
 
 // Trigger TMDB ingestion (protected route - admin only)
-router.post('/ingest', adminMiddleware, async (req, res) => {
+router.post('/ingest', async (req, res) => {
   const pages = parseInt(req.body.pages) || 1
   try {
     await ingestMovies({ pages })
