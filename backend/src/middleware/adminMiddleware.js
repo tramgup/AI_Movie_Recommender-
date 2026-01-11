@@ -3,13 +3,7 @@ import prisma from '../prismaClient.js'
 export default async function adminMiddleware(req, res, next) {
     try {
         // authMiddleware sets `req.userEmail` from the token's `sub` claim
-        const email = req.userEmail || req.user?.email || req.email
-
-        console.log('=== ADMIN MIDDLEWARE DEBUG ===')
-        console.log('req.userEmail:', req.userEmail)
-        console.log('req.user:', req.user)
-        console.log('req.email:', req.email)
-        console.log('Final email used:', email)
+        const email = req.userEmail
 
         if (!email) {
             return res.status(401).json({ message: 'No authenticated user' })
@@ -18,10 +12,6 @@ export default async function adminMiddleware(req, res, next) {
         const user = await prisma.user.findUnique({
             where: { email }
         })
-
-        console.log('User found:', user)
-        console.log('User isAdmin:', user?.isAdmin)
-        console.log('Type of isAdmin:', typeof user?.isAdmin)
 
         if (!user) {
             return res.status(404).json({ message: 'User not found' })
