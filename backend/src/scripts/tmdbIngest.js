@@ -44,44 +44,34 @@ export async function ingestMovies({ pages = 1 } = {}) {
           const creditsData = await creditsResp.json()
           
           // Get top 5 cast members
-          if (creditsData.cast && Array.isArray(creditsData.cast)) {
             cast = creditsData.cast
               .slice(0, 5)
-              .map(actor => actor.name)
-              .filter(name => name) // Filter out any null names
-          }
+              .map(actor => actor.name) 
           
           // Get director
-          if (creditsData.crew && Array.isArray(creditsData.crew)) {
-            const directorObj = creditsData.crew.find(person => person.job === 'Director')
-            director = directorObj ? directorObj.name : null
-          }
-        } else {
-          console.warn(`⚠ Credits fetch returned ${creditsResp.status} for movie ${m.id}`)
-        }
-        
+          const directorInfo = creditsData.crew.find(member => member.job === 'Director')
+          
+          director = directorInfo ? directorInfo.name : null
+
         // Add delay to respect rate limits
         await delay(CREDITS_DELAY_MS)
-      } catch (err) {
+      } 
+    } catch (err) {
         console.error(`Failed to fetch credits for ${m.id}:`, err.message)
       }
 
       try {
-        const updateData = {
-          title: m.title,
-          description: m.overview || null,
-          releaseYear,
-          posterUrl,
-          genre: genres,
-        }
-        
-        // Only add cast/director if they exist
-        if (cast.length > 0) updateData.cast = cast
-        if (director) updateData.director = director
-
         await prisma.movie.upsert({
           where: { tmdbId: m.id },
-          update: updateData,
+          update: {
+            title: m.title,
+            description: m.overview || null,
+            releaseYear,
+            posterUrl,
+            genre: genres,
+            cast,           
+            director,      
+          },
           create: {
             tmdbId: m.id,
             title: m.title,
@@ -89,11 +79,11 @@ export async function ingestMovies({ pages = 1 } = {}) {
             releaseYear,
             posterUrl,
             genre: genres,
-            cast: cast.length > 0 ? cast : [],
-            director: director || null,
+            cast,           
+            director,       
           },
+
         })
-        console.log(`✓ Ingested: ${m.title}${cast.length > 0 ? ` (${cast.length} cast)` : ''}${director ? ` - Dir: ${director}` : ''}`)
       } catch (err) {
         console.error('Upsert failed for', m.id, m.title, err.message)
       }
