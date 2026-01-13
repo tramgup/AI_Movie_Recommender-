@@ -33,6 +33,8 @@ model Movie {
   genre       String[]
   releaseYear Int?
   posterUrl   String?
+  cast        String[] //Array containing the top 5 actors
+  director    String?  
 
   ratings Rating[]
   recommendations Recommendation[]
