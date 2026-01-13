@@ -4,8 +4,14 @@ import prisma from '../prismaClient.js'
 dotenv.config()
 
 const TMDB_API_KEY = process.env.TMDB_API_KEY
+const CREDITS_DELAY_MS = 250 // Add delay between requests to respect rate limits
+
 if (!TMDB_API_KEY) {
   console.error('TMDB_API_KEY not set in environment')
+}
+
+function delay(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms))
 }
 
 export async function ingestMovies({ pages = 1 } = {}) {
@@ -26,16 +32,56 @@ export async function ingestMovies({ pages = 1 } = {}) {
       const releaseYear = m.release_date ? parseInt(m.release_date.slice(0, 4)) : null
       const posterUrl = m.poster_path ? `https://image.tmdb.org/t/p/w500${m.poster_path}` : null
 
+      // Fetch credits for this movie
+      let cast = []
+      let director = null
+      
       try {
+        const creditsUrl = `https://api.themoviedb.org/3/movie/${m.id}/credits?api_key=${TMDB_API_KEY}`
+        const creditsResp = await fetch(creditsUrl)
+        
+        if (creditsResp.ok) {
+          const creditsData = await creditsResp.json()
+          
+          // Get top 5 cast members
+          if (creditsData.cast && Array.isArray(creditsData.cast)) {
+            cast = creditsData.cast
+              .slice(0, 5)
+              .map(actor => actor.name)
+              .filter(name => name) // Filter out any null names
+          }
+          
+          // Get director
+          if (creditsData.crew && Array.isArray(creditsData.crew)) {
+            const directorObj = creditsData.crew.find(person => person.job === 'Director')
+            director = directorObj ? directorObj.name : null
+          }
+        } else {
+          console.warn(`⚠ Credits fetch returned ${creditsResp.status} for movie ${m.id}`)
+        }
+        
+        // Add delay to respect rate limits
+        await delay(CREDITS_DELAY_MS)
+      } catch (err) {
+        console.error(`Failed to fetch credits for ${m.id}:`, err.message)
+      }
+
+      try {
+        const updateData = {
+          title: m.title,
+          description: m.overview || null,
+          releaseYear,
+          posterUrl,
+          genre: genres,
+        }
+        
+        // Only add cast/director if they exist
+        if (cast.length > 0) updateData.cast = cast
+        if (director) updateData.director = director
+
         await prisma.movie.upsert({
           where: { tmdbId: m.id },
-          update: {
-            title: m.title,
-            description: m.overview || null,
-            releaseYear,
-            posterUrl,
-            genre: genres,
-          },
+          update: updateData,
           create: {
             tmdbId: m.id,
             title: m.title,
@@ -43,8 +89,11 @@ export async function ingestMovies({ pages = 1 } = {}) {
             releaseYear,
             posterUrl,
             genre: genres,
+            cast: cast.length > 0 ? cast : [],
+            director: director || null,
           },
         })
+        console.log(`✓ Ingested: ${m.title}${cast.length > 0 ? ` (${cast.length} cast)` : ''}${director ? ` - Dir: ${director}` : ''}`)
       } catch (err) {
         console.error('Upsert failed for', m.id, m.title, err.message)
       }
