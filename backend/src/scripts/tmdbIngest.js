@@ -53,7 +53,7 @@ export async function ingestMovies({ pages = 1 } = {}) {
           
           director = directorInfo ? directorInfo.name : null
 
-        // Add delay to respect rate limits
+        
         await delay(CREDITS_DELAY_MS)
       } 
     } catch (err) {
@@ -91,7 +91,7 @@ export async function ingestMovies({ pages = 1 } = {}) {
   }
 }
 
-// If run directly: node src/scripts/tmdbIngest.js [pages]
+// Run directly: node src/scripts/tmdbIngest.js [pages]
 if (process.argv[1] && process.argv[1].endsWith('tmdbIngest.js')) {
   const pages = parseInt(process.argv[2] || '1')
   ingestMovies({ pages })
