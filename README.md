@@ -1,0 +1,1 @@
+Welcome to my AI movie app. Powered by Node, React, and CHatgpt embeddings. Coming soon.
