@@ -35,6 +35,8 @@ model Movie {
   posterUrl   String?
   cast        String[] //Array containing the top 5 actors
   director    String?
+  embedding   Unsupported("vector(1536)")?
+
 
   ratings Rating[]
   recommendations Recommendation[]
