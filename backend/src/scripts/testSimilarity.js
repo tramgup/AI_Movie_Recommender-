@@ -8,7 +8,7 @@ async function testSimilarity() {
     const randomSkip = Math.floor(Math.random() * (totalMovies - 2))
     
     const seedMovies = await prisma.movie.findMany({
-      take: 2,
+      take: 3,
       skip: randomSkip,
       select: {
         id: true,
