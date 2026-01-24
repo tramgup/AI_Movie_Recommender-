@@ -1,3 +1,5 @@
+import { getGenreName } from '../constants/genres'
+
 export default function MovieDetailsModal({ movie, onClose }) {
   if (!movie) return null
 
@@ -48,7 +50,7 @@ export default function MovieDetailsModal({ movie, onClose }) {
                 <div className="flex flex-wrap gap-2">
                   {movie.genre.map((g) => (
                     <span key={g} className="bg-red-600 px-3 py-1 rounded text-sm">
-                      {g}
+                      {getGenreName(g)}
                     </span>
                   ))}
                 </div>

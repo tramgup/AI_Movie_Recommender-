@@ -34,6 +34,14 @@ export default function Home() {
     }
   }
 
+  const handleClear = () => {
+    setSearchQuery('')
+    setSelectedMovies([])
+    setError('')
+    setHasSearched(false)
+    loadInitialMovies()
+  }
+
   const handleSearch = async (e) => {
     e.preventDefault()
     
@@ -90,7 +98,7 @@ export default function Home() {
     }
 
     const movieIds = selectedMovies.map((m) => m.id)
-    navigate('/similarity', { state: { selectedMovieIds: movieIds } })
+    navigate('/similarity', { state: { selectedMovieIds: movieIds, selectedMovies: selectedMovies } })
   }
 
   const isMovieSelected = (movieId) => {
@@ -100,7 +108,7 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-slate-950">
       {/* Search Section */}
-      <div className="bg-slate-900 py-8 sticky top-16 z-40">
+      <div className="bg-slate-900 py-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <form onSubmit={handleSearch} className="mb-6">
             <div className="flex gap-2">
@@ -119,7 +127,7 @@ export default function Home() {
               </button>
               <button
                 type="button"
-                onClick={loadInitialMovies}
+                onClick={handleClear}
                 className="bg-slate-700 hover:bg-slate-600 text-white font-bold py-3 px-8 rounded transition"
               >
                 Clear
