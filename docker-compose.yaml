@@ -28,6 +28,23 @@ services:
       - "5432:5432"
     volumes:
       - postgres-data:/var/lib/postgresql/data
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: movie-frontend
+    environment:
+      - REACT_APP_API_URL=http://localhost:5003
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    volumes:
+      - ./frontend:/usr/src/app
+      - /usr/src/app/node_modules
+
+
+    
 
 volumes:
   postgres-data:
