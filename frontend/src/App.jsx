@@ -1,0 +1,59 @@
+import { useState, useEffect } from 'react'
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import Login from './pages/Login'
+import Register from './pages/Register'
+import Home from './pages/Home'
+import Similarity from './pages/Similarity'
+import Navbar from './components/Navbar'
+import './App.css'
+
+function App() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [user, setUser] = useState(null)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    // Check if user is logged in on app load
+    const token = localStorage.getItem('token')
+    const userData = localStorage.getItem('user')
+    if (token && userData) {
+      setIsAuthenticated(true)
+      setUser(JSON.parse(userData))
+    }
+    setLoading(false)
+  }, [])
+
+  const handleLogin = (token, userData) => {
+    localStorage.setItem('token', token)
+    localStorage.setItem('user', JSON.stringify(userData))
+    setIsAuthenticated(true)
+    setUser(userData)
+  }
+
+  const handleLogout = () => {
+    localStorage.removeItem('token')
+    localStorage.removeItem('user')
+    setIsAuthenticated(false)
+    setUser(null)
+  }
+
+  if (loading) {
+    return <div className="flex justify-center items-center h-screen">Loading...</div>
+  }
+
+  return (
+    <BrowserRouter>
+      {isAuthenticated && <Navbar user={user} onLogout={handleLogout} />}
+      <Routes>
+        <Route path="/login" element={isAuthenticated ? <Navigate to="/home" /> : <Login onLogin={handleLogin} />} />
+        <Route path="/register" element={isAuthenticated ? <Navigate to="/home" /> : <Register onRegister={handleLogin} />} />
+        <Route path="/home" element={isAuthenticated ? <Home /> : <Navigate to="/login" />} />
+        <Route path="/similarity" element={isAuthenticated ? <Similarity /> : <Navigate to="/login" />} />
+        <Route path="/" element={<Navigate to={isAuthenticated ? "/home" : "/login"} />} />
+      </Routes>
+    </BrowserRouter>
+  )
+}
+
+export default App
+

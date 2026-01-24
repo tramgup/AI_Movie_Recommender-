@@ -24,6 +24,37 @@ router.get('/', async (req, res) => {
 })
 
 /**
+ * Search for movies by title
+ * GET /home/search?query=<search_term>&limit=20
+ */
+router.get('/search', async (req, res) => {
+  const { query, limit = 20 } = req.query
+
+  if (!query || query.trim() === '') {
+    return res.status(400).json({
+      error: 'Search query is required',
+    })
+  }
+
+  try {
+    const movies = await prisma.movie.findMany({
+      where: {
+        title: {
+          contains: query,
+          mode: 'insensitive',
+        },
+      },
+      take: parseInt(limit),
+    })
+
+    return res.json({ query, movies })
+  } catch (err) {
+    console.error(err)
+    return res.sendStatus(503)
+  }
+})
+
+/**
  * Find similar movies based on selected movies
  * POST /home/similar
  * Body: { movieIds: ["id1", "id2", ...] (max 5), limit: 10 (optional) }

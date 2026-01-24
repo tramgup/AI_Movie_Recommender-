@@ -1,3 +1,4 @@
+//can probably get rid of this
 import dotenv from 'dotenv'
 dotenv.config()
 
