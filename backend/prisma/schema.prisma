@@ -37,6 +37,7 @@ model Movie {
   director    String?
   embedding   Unsupported("vector(1536)")?
   isNowPlaying Boolean @default(false)
+  streamingProviders String[] // Array of streaming service names (Netflix, HBO Max, etc.)
 
 
   ratings Rating[]

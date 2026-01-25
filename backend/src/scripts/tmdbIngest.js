@@ -35,6 +35,7 @@ export async function ingestMovies({ pages = 1 } = {}) {
       // Fetch credits for this movie
       let cast = []
       let director = null
+      let streamingProviders = []
       
       try {
         const creditsUrl = `https://api.themoviedb.org/3/movie/${m.id}/credits?api_key=${TMDB_API_KEY}`
@@ -60,6 +61,26 @@ export async function ingestMovies({ pages = 1 } = {}) {
         console.error(`Failed to fetch credits for ${m.id}:`, err.message)
       }
 
+      // Fetch streaming providers for this movie (US only)
+      try {
+        const watchProvidersUrl = `https://api.themoviedb.org/3/movie/${m.id}/watch/providers?api_key=${TMDB_API_KEY}`
+        const watchProvidersResp = await fetch(watchProvidersUrl)
+        
+        if (watchProvidersResp.ok) {
+          const watchProvidersData = await watchProvidersResp.json()
+          const usProviders = watchProvidersData.results?.US
+          
+          // Get flatrate (streaming) providers
+          if (usProviders?.flatrate) {
+            streamingProviders = usProviders.flatrate.map(provider => provider.provider_name)
+          }
+        }
+        
+        await delay(CREDITS_DELAY_MS)
+      } catch (err) {
+        console.error(`Failed to fetch watch providers for ${m.id}:`, err.message)
+      }
+
       try {
         await prisma.movie.upsert({
           where: { tmdbId: m.id },
@@ -70,7 +91,8 @@ export async function ingestMovies({ pages = 1 } = {}) {
             posterUrl,
             genre: genres,
             cast,           
-            director,      
+            director,
+            streamingProviders,
           },
           create: {
             tmdbId: m.id,
@@ -80,7 +102,8 @@ export async function ingestMovies({ pages = 1 } = {}) {
             posterUrl,
             genre: genres,
             cast,           
-            director,       
+            director,
+            streamingProviders,
           },
 
         })

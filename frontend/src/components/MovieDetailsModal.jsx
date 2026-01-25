@@ -63,6 +63,19 @@ export default function MovieDetailsModal({ movie, onClose }) {
                 <p className="text-sm text-slate-300">{movie.description}</p>
               </div>
             )}
+
+            {movie.streamingProviders && movie.streamingProviders.length > 0 && (
+              <div className="mb-4">
+                <p className="text-slate-400">Stream On</p>
+                <div className="flex flex-wrap gap-2">
+                  {movie.streamingProviders.map((provider) => (
+                    <span key={provider} className="bg-green-600 px-3 py-1 rounded text-sm">
+                      {provider}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Close Button */}
