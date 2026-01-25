@@ -1,0 +1,35 @@
+#allows us to initialize multiple docker containers
+
+services:
+  app:
+    build: .
+    container_name: movie-app
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/movie-app
+      - JWT_SECRET=your_jwt_secret_here
+      - NODE_ENV=development
+      - PORT=5003
+    ports:
+      - "5003:5003"
+    depends_on:
+      - db
+    volumes:
+      - .:/app
+      - /app/node_modules
+
+  db:
+    image: pgvector/pgvector:pg13
+    container_name: postgres-db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: movie-app
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+  
+volumes:
+  postgres-data:
+
+

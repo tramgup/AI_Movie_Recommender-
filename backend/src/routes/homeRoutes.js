@@ -8,12 +8,15 @@ router.get('/', async (req, res) => {
   const page = parseInt(req.query.page) || 1
   const take = 20
   const skip = (page - 1) * take
+  // Default home feed shows now playing; pass nowPlaying=false to browse all
+  const nowPlayingOnly = req.query.nowPlaying !== 'false'
 
   try {
     const movies = await prisma.movie.findMany({
+      where: nowPlayingOnly ? { isNowPlaying: true } : undefined,
       skip,
       take,
-      orderBy: { title: 'asc' },
+      orderBy: nowPlayingOnly ? { releaseYear: 'desc' } : { title: 'asc' },
     })
 
     return res.json({ page, movies })

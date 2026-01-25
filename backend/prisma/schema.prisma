@@ -36,6 +36,7 @@ model Movie {
   cast        String[] //Array containing the top 5 actors
   director    String?
   embedding   Unsupported("vector(1536)")?
+  isNowPlaying Boolean @default(false)
 
 
   ratings Rating[]

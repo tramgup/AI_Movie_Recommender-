@@ -23,8 +23,10 @@ export default function Home() {
     setLoading(true)
     setError('')
     try {
-      const result = await api.getMovies(1)
-      setMovies(result.movies || [])
+      const result = await api.getMovies(1, true)
+      // Shuffle the movies randomly
+      const shuffled = [...(result.movies || [])].sort(() => Math.random() - 0.5)
+      setMovies(shuffled)
       setHasSearched(false)
     } catch (err) {
       setError('Failed to load movies')

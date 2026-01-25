@@ -50,8 +50,8 @@ export const api = {
     return res.json()
   },
 
-  getMovies: async (page = 1) => {
-    const res = await fetch(`${API_BASE_URL}/home?page=${page}`, {
+  getMovies: async (page = 1, nowPlaying = true) => {
+    const res = await fetch(`${API_BASE_URL}/home?page=${page}&nowPlaying=${nowPlaying}`, {
       method: 'GET',
       headers: getAuthHeaders(),
     })
