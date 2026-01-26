@@ -1,9 +1,11 @@
 #allows us to initialize multiple docker containers
 
 services:
-  app:
-    build: .
-    container_name: movie-app
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: movie-backend
     environment:
       - DATABASE_URL=postgresql://postgres:postgres@db:5432/movie-app
       - JWT_SECRET=your_jwt_secret_here
@@ -14,7 +16,7 @@ services:
     depends_on:
       - db
     volumes:
-      - .:/app
+      - ./backend:/app
       - /app/node_modules
 
   db:
@@ -42,9 +44,6 @@ services:
     volumes:
       - ./frontend:/usr/src/app
       - /usr/src/app/node_modules
-
-
-    
 
 volumes:
   postgres-data:
