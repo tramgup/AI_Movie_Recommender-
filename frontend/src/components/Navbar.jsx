@@ -13,9 +13,6 @@ export default function Navbar({ user, onLogout }) {
               <Link to="/home" className="hover:text-red-500 transition">
                 Discover
               </Link>
-              <Link to="/similarity" className="hover:text-red-500 transition">
-                Find Similar
-              </Link>
             </div>
           </div>
           <div className="flex items-center space-x-4">

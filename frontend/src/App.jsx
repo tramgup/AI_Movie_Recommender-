@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import Login from './pages/Login'
 import Register from './pages/Register'
-import Home from './pages/Home'
 import Similarity from './pages/Similarity'
 import Navbar from './components/Navbar'
 import './App.css'
@@ -47,8 +46,7 @@ function App() {
       <Routes>
         <Route path="/login" element={isAuthenticated ? <Navigate to="/home" /> : <Login onLogin={handleLogin} />} />
         <Route path="/register" element={isAuthenticated ? <Navigate to="/home" /> : <Register onRegister={handleLogin} />} />
-        <Route path="/home" element={isAuthenticated ? <Home /> : <Navigate to="/login" />} />
-        <Route path="/similarity" element={isAuthenticated ? <Similarity /> : <Navigate to="/login" />} />
+        <Route path="/home" element={isAuthenticated ? <Similarity /> : <Navigate to="/login" />} />
         <Route path="/" element={<Navigate to={isAuthenticated ? "/home" : "/login"} />} />
       </Routes>
     </BrowserRouter>
