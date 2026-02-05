@@ -1,4 +1,4 @@
-#allows us to initialize multiple docker containers
+# Docker Compose configuration for Movie App
 
 services:
   backend:
